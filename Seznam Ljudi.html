@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podatkovna tabela</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input[type="text"], input[type="number"], select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 5px 0 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="submit"], button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        input[type="submit"]:hover, button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .remove-button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .remove-button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Podatkovna tabela</h1>
+
+    <div id="izpisTabele"></div>
+
+    <div class="form-section">
+        <h2>Dodaj nove podatke</h2>
+        <div>Ime:</div>
+        <input type="text" id="ime" placeholder="Vnesite ime">
+        <div>Priimek:</div>
+        <input type="text" id="priimek" placeholder="Vnesite priimek">
+        <div>Starost:</div>
+        <input type="number" id="starost" step="0.01" placeholder="Vnesite starost"><br><br>
+        <div>Število otrok:</div>
+        <input type="number" id="steviloOtrok" placeholder="Vnesite število otrok">
+        <div>Občina:</div>
+        <input type="text" id="obcina" placeholder="Vnesite občino">
+        <div>Spol:</div>
+        <input type="text" id="spol" placeholder="Vnesite spol"><br><br>
+        <input type="submit" value="Dodaj" onclick="vnos()">
+    </div>
+
+    <button onclick="drugaStran()">Naprej</button>
+    <div id="isciOsebo"></div><br><br><br><br>
+
+    <script>
+        var tabela = JSON.parse(localStorage.getItem('tabela')) || [
+            ["Janez", "Koren", "64", "3", "Kranj", "M"],
+            ["Sara", "Ehh", "39", "2", "Jesenice", "Z"],
+            ["Danica", "Malina", "88", "6", "Ljubljana", "Z"],
+            ["Sasa", "Ehh", "24", "1", "Kranj", "Ž"],
+            ["Sandi", "Koren", "37", "1", "Jesenice", "M"],
+            ["Ema", "Koren", "55", "3", "Jesenice", "Ž"]
+        ];
+
+        function vnos() {
+            var ime = document.getElementById("ime").value;
+            var priimek = document.getElementById("priimek").value;
+            var starost = document.getElementById("starost").value;
+            starost = Math.round(parseFloat(starost));
+            var steviloOtrok = document.getElementById("steviloOtrok").value;
+            var obcina = document.getElementById("obcina").value;
+            var spol = document.getElementById("spol").value.toUpperCase();
+
+            // Validate input fields
+            if (!/^[a-zA-Z]+$/.test(ime) || !/^[a-zA-Z]+$/.test(priimek)) {
+                alert("Ime in Priimek lahko vsebujeta le črke!");
+                return;
+            }
+
+            if (spol !== "M" && spol !== "Ž") {
+                alert("Spol mora biti 'M' ali 'Ž'!");
+                return;
+            }
+
+            if (ime && priimek && starost && steviloOtrok && obcina && spol) {
+                var oseba = [ime, priimek, starost, steviloOtrok, obcina, spol];
+                tabela.push(oseba);
+                localStorage.setItem('tabela', JSON.stringify(tabela));
+                izpisTabele();
+            } else {
+                alert("Vsa polja morajo biti izpolnjena!");
+            }
+        }
+
+        function izpisTabele() {
+            var shrani = document.getElementById("izpisTabele");
+            var urejenaTabela = "<table><tr><th>Ime</th><th>Priimek</th><th>Starost</th><th>Število otrok</th><th>Občina</th><th>Spol</th><th>Odstrani</th></tr>";
+            for (var i = 0; i < tabela.length; i++) {
+                urejenaTabela += "<tr>";
+                var oseba = tabela[i];
+                for (var j = 0; j < oseba.length; j++) {
+                    var lastnost = oseba[j];
+                    urejenaTabela += "<td>" + lastnost + "</td>";
+                }
+                urejenaTabela += `<td><button class="remove-button" onclick="odstrani(${i})">&times;</button></td>`;
+                urejenaTabela += "</tr>";
+            }
+            urejenaTabela += "</table>";
+            shrani.innerHTML = urejenaTabela;
+        }
+
+        function odstrani(index) {
+            tabela.splice(index, 1);
+            localStorage.setItem('tabela', JSON.stringify(tabela));
+            izpisTabele();
+        }
+
+        function drugaStran() {
+            location.href = "Seznam Lokacij.html";
+        }
+
+        izpisTabele();
+    </script>
+</div>
+
+</body>
+</html>

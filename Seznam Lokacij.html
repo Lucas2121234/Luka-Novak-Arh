@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Table with Edit Section</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f7;
+            color: #333;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h2 {
+            color: #444;
+        }
+
+        button, input[type="button"] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .edit-input {
+            width: 90%;
+            padding: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .remove-button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .remove-button:hover {
+            background-color: darkred;
+        }
+
+        .add-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .add-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="drugaStran()">Nazaj</button><br>
+    <h2>Tabela lokacij</h2>
+    <p> 
+        <button type="button" onclick="toggleTable()">Izpiši Tabelo</button>
+    </p>
+
+    <div class="container" id="izpisTabele"></div>
+    <div id="tableContainer">
+        <table id="izpis"></table>
+    </div>
+
+    <button class="add-button" onclick="dodajVrsto()">Add Row</button>
+    <h5>Luka Novak Arh</h5>
+    <script>
+        var sportniki = JSON.parse(localStorage.getItem("sportniki")) || [
+            {Ulica: "1", hisnaStevilka: 1, ime: "1", priimek: "1", starost: 1, stevilootrok: "1", obcina: "1", spol: "M"},
+            {Ulica: "2", hisnaStevilka: 2, ime: "2", priimek: "2", starost: 2, stevilootrok: "2", obcina: "2", spol: "Z"},
+            {Ulica: "3", hisnaStevilka: 3, ime: "3", priimek: "3", starost: 3, stevilootrok: "3", obcina: "3", spol: "Z"},
+            {Ulica: "4", hisnaStevilka: 4, ime: "4", priimek: "4", starost: 4, stevilootrok: "4", obcina: "4", spol: "Z"},
+            {Ulica: "5", hisnaStevilka: 5, ime: "5", priimek: "5", starost: 5, stevilootrok: "5", obcina: "5", spol: "M"},
+            {Ulica: "6", hisnaStevilka: 6, ime: "6", priimek: "6", starost: 6, stevilootrok: "6", obcina: "6", spol: "Z"}
+        ];
+
+        function drugaStran() {
+            location = "Seznam Ljudi.html";
+        }
+
+        function toggleTable() {
+            var tableContainer = document.getElementById("tableContainer");
+            if (tableContainer.innerHTML === "") {
+                Izpis();
+            } else {
+                tableContainer.innerHTML = "";
+            }
+        }
+
+        function Izpis() {
+            var tekst = "<table><tr><th>Ulica</th><th>Hišna številka</th><th>Ime</th><th>Priimek</th><th>Starost</th><th>Število otrok</th><th>Občina</th><th>Spol</th><th>Odstrani</th></tr>";
+            for (var i = 0; i < sportniki.length; i++) {
+                tekst += "<tr id='row" + i + "'>" +
+                    "<td><input type='text' value='" + sportniki[i].Ulica + "' class='edit-input' id='ulica" + i + "' pattern='[A-Za-z\\s]+' onchange='uredi(" + i + ")'></td>" +
+                    "<td><input type='number' value='" + sportniki[i].hisnaStevilka + "' class='edit-input' id='hisnaStevilka" + i + "' onchange='uredi(" + i + ")'></td>" +
+                    "<td><input type='text' value='" + sportniki[i].ime + "' class='edit-input' id='ime" + i + "' onchange='uredi(" + i + ")'></td>" +
+                    "<td><input type='text' value='" + sportniki[i].priimek + "' class='edit-input' id='priimek" + i + "' onchange='uredi(" + i + ")'></td>" +
+                    "<td><input type='number' value='" + sportniki[i].starost + "' class='edit-input' id='starost" + i + "' step='1' onchange='uredi(" + i + ")'></td>" +
+                    "<td><input type='number' value='" + sportniki[i].stevilootrok + "' class='edit-input' id='stevilootrok" + i + "' onchange='uredi(" + i + ")'></td>" +
+                    "<td><input type='text' value='" + sportniki[i].obcina + "' class='edit-input' id='obcina" + i + "' onchange='uredi(" + i + ")'></td>" +
+                    "<td><input type='text' value='" + sportniki[i].spol + "' class='edit-input' id='spol" + i + "' onchange='uredi(" + i + ")'></td>" +
+                    "<td><button class='remove-button' onclick='odstrani(" + i + ")'>&times;</button></td>" +
+                    "</tr>";
+            }
+            tekst += "</table>";
+            document.getElementById("tableContainer").innerHTML = tekst;
+        }
+
+        function uredi(index) {
+            sportniki[index].Ulica = document.getElementById('ulica' + index).value;
+            sportniki[index].hisnaStevilka = document.getElementById('hisnaStevilka' + index).value;
+            sportniki[index].ime = document.getElementById('ime' + index).value;
+            sportniki[index].priimek = document.getElementById('priimek' + index).value;
+            sportniki[index].starost = document.getElementById('starost' + index).value;
+            sportniki[index].stevilootrok = document.getElementById('stevilootrok' + index).value;
+            sportniki[index].obcina = document.getElementById('obcina' + index).value;
+            sportniki[index].spol = document.getElementById('spol' + index).value;
+            saveData();
+        }
+
+        function odstrani(index) {
+            sportniki.splice(index, 1);
+            saveData();
+            Izpis();
+        }
+
+        function dodajVrsto() {
+            sportniki.push({
+                Ulica: "", hisnaStevilka: "", ime: "", priimek: "", starost: "", stevilootrok: "", obcina: "", spol: ""
+            });
+            saveData();
+            Izpis();
+        }
+
+        function saveData() {
+            localStorage.setItem("sportniki", JSON.stringify(sportniki));
+        }
+
+        window.onload = function() {
+            Izpis();
+        };
+    </script>
+</body>
+</html>
